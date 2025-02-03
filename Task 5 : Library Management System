@@ -1,0 +1,136 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class Book {
+public:
+    string title;
+    string author;
+    string isbn;
+    bool available;
+
+    Book(string t, string a, string i) : title(t), author(a), isbn(i), available(true) {}
+
+    void display() {
+        cout << "Title: " << title << ", Author: " << author << ", ISBN: " << isbn
+             << ", Available: " << (available ? "Yes" : "No") << endl;
+    }
+};
+
+class Library {
+private:
+    vector<Book> books;
+
+public:
+    void addBook(string title, string author, string isbn) {
+        books.push_back(Book(title, author, isbn));
+    }
+
+    Book* searchBook(string searchTerm) {
+        for (auto& book : books) {
+            if (book.title == searchTerm || book.author == searchTerm || book.isbn == searchTerm) {
+                return &book;
+            }
+        }
+        return nullptr;
+    }
+
+    void checkoutBook(string bookIdentifier) {
+        Book* book = searchBook(bookIdentifier);
+        if (book != nullptr && book->available) {
+            book->available = false;
+            cout << "Book checked out successfully!" << endl;
+        } else {
+            cout << "Book not available or not found." << endl;
+        }
+    }
+
+    void returnBook(string bookIdentifier) {
+        Book* book = searchBook(bookIdentifier);
+        if (book != nullptr && !book->available) {
+            book->available = true;
+            cout << "Book returned successfully!" << endl;
+        } else {
+            cout << "Book not found or already available." << endl;
+        }
+    }
+
+    void displayBooks() {
+        for (auto& book : books) {
+            book.display();
+        }
+    }
+};
+
+void showMenu() {
+    cout << "\nLibrary Management System" << endl;
+    cout << "1. Add Book" << endl;
+    cout << "2. Search Book" << endl;
+    cout << "3. Checkout Book" << endl;
+    cout << "4. Return Book" << endl;
+    cout << "5. Display All Books" << endl;
+    cout << "6. Exit" << endl;
+    cout << "Enter your choice: ";
+}
+
+int main() {
+    Library library;
+    int choice;
+
+    while (true) {
+        showMenu();
+        cin >> choice;
+        cin.ignore(); // To clear any leftover newline characters
+
+        switch (choice) {
+            case 1: {
+                string title, author, isbn;
+                cout << "Enter Book Title: ";
+                getline(cin, title);
+                cout << "Enter Book Author: ";
+                getline(cin, author);
+                cout << "Enter Book ISBN: ";
+                getline(cin, isbn);
+                library.addBook(title, author, isbn);
+                break;
+            }
+            case 2: {
+                string searchTerm;
+                cout << "Enter book title, author, or ISBN to search: ";
+                getline(cin, searchTerm);
+                Book* foundBook = library.searchBook(searchTerm);
+                if (foundBook != nullptr) {
+                    foundBook->display();
+                } else {
+                    cout << "Book not found!" << endl;
+                }
+                break;
+            }
+            case 3: {
+                string bookIdentifier;
+                cout << "Enter Book Title, Author, or ISBN to checkout: ";
+                getline(cin, bookIdentifier);
+                library.checkoutBook(bookIdentifier);
+                break;
+            }
+            case 4: {
+                string bookIdentifier;
+                cout << "Enter Book Title, Author, or ISBN to return: ";
+                getline(cin, bookIdentifier);
+                library.returnBook(bookIdentifier);
+                break;
+            }
+            case 5: {
+                library.displayBooks();
+                break;
+            }
+            case 6:
+                cout << "Exiting system. Goodbye!" << endl;
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+    }
+}
